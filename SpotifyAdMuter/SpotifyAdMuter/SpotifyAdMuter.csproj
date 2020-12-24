@@ -5,6 +5,12 @@
     <TargetFramework>net5.0-windows</TargetFramework>
     <UseWindowsForms>true</UseWindowsForms>
     <Nullable>enable</Nullable>
+    <Company>Zintom</Company>
+    <Authors>Tom Zsinko</Authors>
+    <Copyright>Zintom 2020</Copyright>
+    <Description>Blocks adverts from playing on Spotify by muting the volume of the application when one plays.</Description>
+    <NeutralLanguage>en</NeutralLanguage>
+    <Product>Spotify Advert Muter</Product>
   </PropertyGroup>
 
   <ItemGroup>
