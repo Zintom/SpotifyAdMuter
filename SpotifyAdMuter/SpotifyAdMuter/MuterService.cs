@@ -9,6 +9,8 @@ namespace SpotifyAdMuter
     /// </summary>
     public class MuterService
     {
+        public delegate void StatusChangedHandler(bool advertPlaying);
+        public event StatusChangedHandler? StatusChanged;
 
         private readonly Thread _serviceThread;
         private volatile bool _serviceThreadStop = false;
@@ -68,6 +70,7 @@ namespace SpotifyAdMuter
             while (!_serviceThreadStop)
             {
                 bool isAdvertPlaying = IsAdvertPlaying();
+                StatusChanged?.Invoke(isAdvertPlaying);
 
                 if (!wasAdvertPlaying && isAdvertPlaying)
                 {
@@ -78,7 +81,7 @@ namespace SpotifyAdMuter
                 else if (wasAdvertPlaying && !isAdvertPlaying)
                 {
                     MediaAudioController.MuteSpotify(false);
-                    MediaAudioController.FadeSpotifyVolume(false, 4);
+                    MediaAudioController.FadeSpotifyVolume(false, 10);
 
                     Debug.WriteLine("Adverts finished, unmuted audio.");
                 }
@@ -97,15 +100,29 @@ namespace SpotifyAdMuter
         {
             var spotifyProcesses = Process.GetProcessesByName("Spotify");
 
+            if (spotifyProcesses.Length == 0) return false;
+
+            // If all the MainWindowTitle's include the name Spotify,
+            // this indicates that a Sponsored Message is showing
+            // as the MainWindowTitle should be the name of a song or "Advertisement".
+            bool allTitlesIncludeSpotify = true;
+
             for (int i = 0; i < spotifyProcesses.Length; i++)
             {
+                // If the MainWindowTitle is blatantly "Advertisement" then immediately return.
                 if (spotifyProcesses[i].MainWindowTitle == "Advertisement")
                 {
                     return true;
                 }
+
+                if (!spotifyProcesses[i].MainWindowTitle.StartsWith("Spotify") &&
+                    !string.IsNullOrEmpty(spotifyProcesses[i].MainWindowTitle))
+                {
+                    allTitlesIncludeSpotify = false;
+                }
             }
 
-            return false;
+            return allTitlesIncludeSpotify;
         }
 
     }
