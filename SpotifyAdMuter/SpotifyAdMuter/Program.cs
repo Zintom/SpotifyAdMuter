@@ -42,7 +42,20 @@ namespace SpotifyAdMuter
             _trayIcon.BalloonTipText = "I'm running in the system tray.";
             _trayIcon.ShowBalloonTip(3000);
 
+            muterService.StatusChanged += MuterService_StatusChanged;
             muterService.BeginMuting();
+        }
+
+        private void MuterService_StatusChanged(bool advertPlaying)
+        {
+            if (advertPlaying)
+            {
+                _trayIcon.Text = "Spotify muted, nothing is playing or an advert is playing.";
+            }
+            else
+            {
+                _trayIcon.Text = "No adverts detected.";
+            }
         }
 
         void Exit(object? sender, EventArgs e)
