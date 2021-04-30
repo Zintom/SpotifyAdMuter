@@ -1,6 +1,7 @@
 ﻿using SpotifyAdMuter.Helpers;
 using System.Diagnostics;
 using System.Threading;
+using static SpotifyAdMuter.Helpers.SpotifyAudioController;
 
 namespace SpotifyAdMuter
 {
@@ -14,10 +15,14 @@ namespace SpotifyAdMuter
 
         private readonly Thread _serviceThread;
         private volatile bool _serviceThreadStop = false;
-        private readonly ManualResetEvent _serviceThreadGate = new ManualResetEvent(true);
+        private readonly ManualResetEvent _serviceThreadGate = new(true);
 
-        public MuterService()
+        private readonly SpotifyAudioController _spotifyAudioController;
+
+        public MuterService(SpotifyAudioController spotifyAudioController)
         {
+            _spotifyAudioController = spotifyAudioController;
+
             // The worker thread should be low impact on the system,
             // so make it Background and BelowNormal priority.
             _serviceThread = new Thread(ServiceThread)
@@ -32,8 +37,8 @@ namespace SpotifyAdMuter
         public void BeginMuting()
         {
             // If the service was previously running,
-            // wait for it to finish.
-            _serviceThreadGate.WaitOne();
+            // end it and wait for it to exit.
+            EndMuting();
 
             _serviceThread.Start();
         }
@@ -52,8 +57,8 @@ namespace SpotifyAdMuter
 
             _serviceThreadStop = false;
 
-            MediaAudioController.MuteSpotify(false);
-            MediaAudioController.FadeSpotifyVolume(false, 15);
+            _spotifyAudioController.MuteSpotify(false);
+            _spotifyAudioController.FadeSpotifyVolume(FadeDirection.Up, 0.15f);
         }
 
         /// <summary>
@@ -74,14 +79,14 @@ namespace SpotifyAdMuter
 
                 if (!wasAdvertPlaying && isAdvertPlaying)
                 {
-                    MediaAudioController.FadeSpotifyVolume(true, 10);
+                    _spotifyAudioController.FadeSpotifyVolume(FadeDirection.Down, 0.10f);
 
                     Debug.WriteLine("Adverts detected, muting audio.");
                 }
                 else if (wasAdvertPlaying && !isAdvertPlaying)
                 {
-                    MediaAudioController.MuteSpotify(false);
-                    MediaAudioController.FadeSpotifyVolume(false, 10);
+                    _spotifyAudioController.MuteSpotify(false);
+                    _spotifyAudioController.FadeSpotifyVolume(FadeDirection.Up, 0.10f);
 
                     Debug.WriteLine("Adverts finished, unmuted audio.");
                 }
