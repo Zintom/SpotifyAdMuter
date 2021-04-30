@@ -1,3 +1,4 @@
+using SpotifyAdMuter.Helpers;
 using System;
 using System.Windows.Forms;
 
@@ -21,13 +22,13 @@ namespace SpotifyAdMuter
 
     public class TrayApplicationContext : ApplicationContext
     {
-        private readonly MuterService muterService = new MuterService();
+        private readonly MuterService _muterService = new MuterService(new SpotifyAudioController(new NAudioVolumeMixer()));
 
         private readonly NotifyIcon _trayIcon;
 
         public TrayApplicationContext()
         {
-            ContextMenuStrip menuStrip = new ContextMenuStrip();
+            var menuStrip = new ContextMenuStrip();
             menuStrip.Items.Add(new ToolStripMenuItem("Exit", null, Exit));
 
             // Initialize Tray Icon
@@ -42,8 +43,8 @@ namespace SpotifyAdMuter
             _trayIcon.BalloonTipText = "I'm running in the system tray.";
             _trayIcon.ShowBalloonTip(3000);
 
-            muterService.StatusChanged += MuterService_StatusChanged;
-            muterService.BeginMuting();
+            _muterService.StatusChanged += MuterService_StatusChanged;
+            _muterService.BeginMuting();
         }
 
         private void MuterService_StatusChanged(bool advertPlaying)
@@ -60,7 +61,7 @@ namespace SpotifyAdMuter
 
         void Exit(object? sender, EventArgs e)
         {
-            muterService.EndMuting();
+            _muterService.EndMuting();
 
             // Hide tray icon, otherwise it will remain shown until user mouses over it
             _trayIcon.Visible = false;
