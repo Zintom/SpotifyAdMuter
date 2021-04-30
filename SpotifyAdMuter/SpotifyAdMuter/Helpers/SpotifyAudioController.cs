@@ -1,13 +1,28 @@
-﻿using SpotifyAdMuter.Helpers;
-using System.Diagnostics;
+﻿using System.Diagnostics;
 using System.Threading;
 
 namespace SpotifyAdMuter.Helpers
 {
-    public static class MediaAudioController
+    /// <summary>
+    /// Provides helper methods to mute/fade the audio on the Spotify application.
+    /// </summary>
+    public class SpotifyAudioController
     {
 
-        public static int[] GetSpotifyProcessIDs()
+        public enum FadeDirection
+        {
+            Up,
+            Down
+        }
+
+        private readonly IVolumeMixer _volumeMixer;
+
+        public SpotifyAudioController(IVolumeMixer volumeMixer)
+        {
+            _volumeMixer = volumeMixer;
+        }
+
+        private int[] GetSpotifyProcessIDs()
         {
             // Get all processes named "Spotify"
             Process[] pList = Process.GetProcessesByName("Spotify");
@@ -21,54 +36,54 @@ namespace SpotifyAdMuter.Helpers
             return spotifyProcessIDs;
         }
 
-        public static void MuteSpotify(bool mute)
+        public void MuteSpotify(bool mute)
         {
             foreach (var spotifyProcessId in GetSpotifyProcessIDs())
             {
-                VolumeMixer.SetApplicationMute(spotifyProcessId, mute);
+                _volumeMixer.SetApplicationMute(spotifyProcessId, mute);
             }
         }
 
-        private static float restoreVolume = 100;
-        public static void FadeSpotifyVolume(bool fadeDown, int fadeSpeed = 10)
+        private readonly float _restoreVolume = 1;
+        public void FadeSpotifyVolume(FadeDirection fadeDirection, float fadeSpeed = 0.1f)
         {
             foreach (var spotifyProcessId in GetSpotifyProcessIDs())
             {
                 // Get the current volume
-                float? initVol = VolumeMixer.GetApplicationVolume(spotifyProcessId);
+                float? initVol = _volumeMixer.GetApplicationVolume(spotifyProcessId);
 
                 if (initVol != null)
                 {
                     float animateVolume = (float)initVol;
 
-                    if (!fadeDown)
+                    if (fadeDirection == FadeDirection.Up)
                     {
                         // If the initial volume is already faded in, then there's no need to fade in.
-                        if (initVol == restoreVolume) { return; };
+                        if (initVol == _restoreVolume) { return; };
                     }
 
                     // Animate volume up/down.
                     new Thread(new ThreadStart(() =>
                     {
-                        if (fadeDown)
+                        if (fadeDirection == FadeDirection.Down)
                         {
                             while (animateVolume > 0)
                             {
                                 animateVolume -= fadeSpeed;
-                                VolumeMixer.SetApplicationVolume(spotifyProcessId, animateVolume);
+                                _volumeMixer.SetApplicationVolume(spotifyProcessId, animateVolume);
                                 Thread.Sleep(8);
                             }
-                            VolumeMixer.SetApplicationVolume(spotifyProcessId, 0);
+                            _volumeMixer.SetApplicationVolume(spotifyProcessId, 0);
                         }
                         else
                         {
-                            while (animateVolume < restoreVolume)
+                            while (animateVolume < _restoreVolume)
                             {
                                 animateVolume += fadeSpeed;
-                                VolumeMixer.SetApplicationVolume(spotifyProcessId, animateVolume);
+                                _volumeMixer.SetApplicationVolume(spotifyProcessId, animateVolume);
                                 Thread.Sleep(8);
                             }
-                            VolumeMixer.SetApplicationVolume(spotifyProcessId, restoreVolume);
+                            _volumeMixer.SetApplicationVolume(spotifyProcessId, _restoreVolume);
                         }
                     })).Start();
                 }
