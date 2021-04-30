@@ -11,10 +11,16 @@
     <Description>Blocks adverts from playing on Spotify by muting the volume of the application when one plays.</Description>
     <NeutralLanguage>en</NeutralLanguage>
     <Product>Spotify Advert Muter</Product>
+    <ApplicationIcon>spotifyadblockericon.ico</ApplicationIcon>
   </PropertyGroup>
 
   <ItemGroup>
-    <Folder Include="Helpers\" />
+    <None Include="..\.editorconfig" Link=".editorconfig" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="NAudio.Core" Version="2.0.0" />
+    <PackageReference Include="NAudio.Wasapi" Version="2.0.0" />
   </ItemGroup>
 
   <ItemGroup>
