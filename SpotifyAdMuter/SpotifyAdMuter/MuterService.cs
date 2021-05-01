@@ -1,5 +1,9 @@
 ﻿using SpotifyAdMuter.Helpers;
+using System;
 using System.Diagnostics;
+using System.Runtime.InteropServices;
+using System.Security;
+using System.Text;
 using System.Threading;
 using static SpotifyAdMuter.Helpers.SpotifyAudioController;
 
@@ -110,24 +114,39 @@ namespace SpotifyAdMuter
             // If all the MainWindowTitle's include the name Spotify,
             // this indicates that a Sponsored Message is showing
             // as the MainWindowTitle should be the name of a song or "Advertisement".
-            bool allTitlesIncludeSpotify = true;
+            //bool allTitlesIncludeSpotify = true;
 
             for (int i = 0; i < spotifyProcesses.Length; i++)
             {
+                //StringBuilder windowText = new StringBuilder(256);
+                //UnsafeNativeMethods.GetWindowText(spotifyProcesses[i].MainWindowHandle, windowText, windowText.Capacity);
+                //Debug.WriteLine(windowText.ToString());
+
                 // If the MainWindowTitle is blatantly "Advertisement" then immediately return.
                 if (spotifyProcesses[i].MainWindowTitle == "Advertisement")
                 {
                     return true;
                 }
 
-                if (!spotifyProcesses[i].MainWindowTitle.StartsWith("Spotify") &&
-                    !string.IsNullOrEmpty(spotifyProcesses[i].MainWindowTitle))
+                if (spotifyProcesses[i].MainWindowTitle.StartsWith("Spotify"))
                 {
-                    allTitlesIncludeSpotify = false;
+                    return true;
                 }
+
+                //if (!spotifyProcesses[i].MainWindowTitle.StartsWith("Spotify"))// &&
+                //    //!string.IsNullOrEmpty(spotifyProcesses[i].MainWindowTitle))
+                //{
+                //    allTitlesIncludeSpotify = false;
+                //}
             }
 
-            return allTitlesIncludeSpotify;
+            return false;
+            //if (allTitlesIncludeSpotify)
+            //{
+
+            //}
+
+            //return allTitlesIncludeSpotify;
         }
 
     }
