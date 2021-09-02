@@ -1,4 +1,5 @@
-﻿using SpotifyAdMuter.Helpers;
+﻿using SpotifyAdMuter.Blockers;
+using SpotifyAdMuter.Helpers;
 using System;
 using System.Diagnostics;
 using System.Runtime.InteropServices;
@@ -12,7 +13,7 @@ namespace SpotifyAdMuter
     /// <summary>
     /// Actively identifies when the Spotify application is playing an advertisement and mutes the mixer audio when this is detected.
     /// </summary>
-    public class MuterService
+    public class AdvertDetectorService
     {
         public delegate void StatusChangedHandler(bool advertPlaying);
         public event StatusChangedHandler? StatusChanged;
@@ -21,11 +22,13 @@ namespace SpotifyAdMuter
         private volatile bool _serviceThreadStop = false;
         private readonly ManualResetEvent _serviceThreadGate = new(true);
 
-        private readonly SpotifyAudioController _spotifyAudioController;
+        private readonly IAdvertBlocker _advertBlocker;
+        //private readonly SpotifyAudioController _spotifyAudioController;
 
-        public MuterService(SpotifyAudioController spotifyAudioController)
+        public AdvertDetectorService(IAdvertBlocker advertBlocker)//SpotifyAudioController spotifyAudioController)
         {
-            _spotifyAudioController = spotifyAudioController;
+            _advertBlocker = advertBlocker;
+            //_spotifyAudioController = spotifyAudioController;
 
             // The worker thread should be low impact on the system,
             // so make it Background and BelowNormal priority.
@@ -36,13 +39,13 @@ namespace SpotifyAdMuter
         }
 
         /// <summary>
-        /// Starts the service.
+        /// Begins detecting ads.
         /// </summary>
-        public void BeginMuting()
+        public void StartService()
         {
             // If the service was previously running,
             // end it and wait for it to exit.
-            EndMuting();
+            StopService();
 
             _serviceThread.Start();
         }
@@ -50,7 +53,7 @@ namespace SpotifyAdMuter
         /// <summary>
         /// Ends the service and unmutes audio.
         /// </summary>
-        public void EndMuting()
+        public void StopService()
         {
             // Indicate to the service thread that it needs to stop.
             _serviceThreadStop = true;
@@ -61,8 +64,9 @@ namespace SpotifyAdMuter
 
             _serviceThreadStop = false;
 
-            _spotifyAudioController.MuteSpotify(false);
-            _spotifyAudioController.FadeSpotifyVolume(FadeDirection.Up, 0.15f);
+            _advertBlocker.Unblock();
+            //_spotifyAudioController.MuteSpotify(false);
+            //_spotifyAudioController.FadeSpotifyVolume(FadeDirection.Up, 0.15f);
         }
 
         /// <summary>
@@ -83,16 +87,18 @@ namespace SpotifyAdMuter
 
                 if (!wasAdvertPlaying && isAdvertPlaying)
                 {
-                    _spotifyAudioController.FadeSpotifyVolume(FadeDirection.Down, 0.10f);
+                    _advertBlocker.Block();
+                    //_spotifyAudioController.FadeSpotifyVolume(FadeDirection.Down, 0.10f);
 
-                    Debug.WriteLine("Adverts detected, muting audio.");
+                    //Debug.WriteLine("Adverts detected, muting audio.");
                 }
                 else if (wasAdvertPlaying && !isAdvertPlaying)
                 {
-                    _spotifyAudioController.MuteSpotify(false);
-                    _spotifyAudioController.FadeSpotifyVolume(FadeDirection.Up, 0.10f);
+                    _advertBlocker.Unblock();
+                    //_spotifyAudioController.MuteSpotify(false);
+                    //_spotifyAudioController.FadeSpotifyVolume(FadeDirection.Up, 0.10f);
 
-                    Debug.WriteLine("Adverts finished, unmuted audio.");
+                    //Debug.WriteLine("Adverts finished, unmuted audio.");
                 }
 
                 wasAdvertPlaying = isAdvertPlaying;

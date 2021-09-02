@@ -1,3 +1,4 @@
+using SpotifyAdMuter.Blockers;
 using SpotifyAdMuter.Helpers;
 using System;
 using System.Windows.Forms;
@@ -22,7 +23,7 @@ namespace SpotifyAdMuter
 
     public class TrayApplicationContext : ApplicationContext
     {
-        private readonly MuterService _muterService = new MuterService(new SpotifyAudioController(new NAudioVolumeMixer()));
+        private readonly AdvertDetectorService _muterService = new AdvertDetectorService(new MuterBlocker(new SpotifyAudioController(new NAudioVolumeMixer())));
 
         private readonly NotifyIcon _trayIcon;
 
@@ -44,7 +45,7 @@ namespace SpotifyAdMuter
             _trayIcon.ShowBalloonTip(3000);
 
             _muterService.StatusChanged += MuterService_StatusChanged;
-            _muterService.BeginMuting();
+            _muterService.StartService();
         }
 
         private void MuterService_StatusChanged(bool advertPlaying)
@@ -61,7 +62,7 @@ namespace SpotifyAdMuter
 
         void Exit(object? sender, EventArgs e)
         {
-            _muterService.EndMuting();
+            _muterService.StopService();
 
             // Hide tray icon, otherwise it will remain shown until user mouses over it
             _trayIcon.Visible = false;
