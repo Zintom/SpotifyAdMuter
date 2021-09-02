@@ -123,7 +123,8 @@ namespace SpotifyAdMuter
                 //Debug.WriteLine(windowText.ToString());
 
                 // If the MainWindowTitle is blatantly "Advertisement" then immediately return.
-                if (spotifyProcesses[i].MainWindowTitle == "Advertisement")
+                if (spotifyProcesses[i].MainWindowTitle == "Advertisement" ||
+                    spotifyProcesses[i].MainWindowTitle == "Shop now")
                 {
                     return true;
                 }
