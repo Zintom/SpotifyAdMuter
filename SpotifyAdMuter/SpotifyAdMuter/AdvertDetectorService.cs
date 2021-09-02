@@ -65,8 +65,6 @@ namespace SpotifyAdMuter
             _serviceThreadStop = false;
 
             _advertBlocker.Unblock();
-            //_spotifyAudioController.MuteSpotify(false);
-            //_spotifyAudioController.FadeSpotifyVolume(FadeDirection.Up, 0.15f);
         }
 
         /// <summary>
@@ -88,17 +86,10 @@ namespace SpotifyAdMuter
                 if (!wasAdvertPlaying && isAdvertPlaying)
                 {
                     _advertBlocker.Block();
-                    //_spotifyAudioController.FadeSpotifyVolume(FadeDirection.Down, 0.10f);
-
-                    //Debug.WriteLine("Adverts detected, muting audio.");
                 }
                 else if (wasAdvertPlaying && !isAdvertPlaying)
                 {
                     _advertBlocker.Unblock();
-                    //_spotifyAudioController.MuteSpotify(false);
-                    //_spotifyAudioController.FadeSpotifyVolume(FadeDirection.Up, 0.10f);
-
-                    //Debug.WriteLine("Adverts finished, unmuted audio.");
                 }
 
                 wasAdvertPlaying = isAdvertPlaying;
