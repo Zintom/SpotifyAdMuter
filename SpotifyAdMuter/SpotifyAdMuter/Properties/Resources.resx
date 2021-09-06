@@ -2024,4 +2024,10 @@
         gAEAAMADAADgBwAA8A8AAA==
 </value>
   </data>
+  <data name="BlockingModeAfk" xml:space="preserve">
+    <value>This mode blocks adverts by killing and relaunching the Spotify process when they are detected.</value>
+  </data>
+  <data name="BlockingModeMuter" xml:space="preserve">
+    <value>This mode blocks adverts by muting them.</value>
+  </data>
 </root>

@@ -69,5 +69,23 @@ namespace SpotifyAdMuter.Properties {
                 return ((System.Drawing.Icon)(obj));
             }
         }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to This mode blocks adverts by killing and relaunching the Spotify process when they are detected..
+        /// </summary>
+        internal static string BlockingModeAfk {
+            get {
+                return ResourceManager.GetString("BlockingModeAfk", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to This mode blocks adverts by muting them..
+        /// </summary>
+        internal static string BlockingModeMuter {
+            get {
+                return ResourceManager.GetString("BlockingModeMuter", resourceCulture);
+            }
+        }
     }
 }
