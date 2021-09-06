@@ -1,12 +1,6 @@
 ﻿using SpotifyAdMuter.Blockers;
-using SpotifyAdMuter.Helpers;
-using System;
 using System.Diagnostics;
-using System.Runtime.InteropServices;
-using System.Security;
-using System.Text;
 using System.Threading;
-using static SpotifyAdMuter.Helpers.SpotifyAudioController;
 
 namespace SpotifyAdMuter
 {
@@ -22,13 +16,12 @@ namespace SpotifyAdMuter
         private volatile bool _serviceThreadStop = false;
         private readonly ManualResetEvent _serviceThreadGate = new(true);
 
-        private readonly IAdvertBlocker _advertBlocker;
-        //private readonly SpotifyAudioController _spotifyAudioController;
+        private IAdvertBlocker? _advertBlocker;
+        public IAdvertBlocker? AdvertBlocker { get => _advertBlocker; set => _advertBlocker = value; }
 
-        public AdvertDetectorService(IAdvertBlocker advertBlocker)//SpotifyAudioController spotifyAudioController)
+        public AdvertDetectorService(IAdvertBlocker? advertBlocker = null)
         {
             _advertBlocker = advertBlocker;
-            //_spotifyAudioController = spotifyAudioController;
 
             // The worker thread should be low impact on the system,
             // so make it Background and BelowNormal priority.
@@ -64,7 +57,7 @@ namespace SpotifyAdMuter
 
             _serviceThreadStop = false;
 
-            _advertBlocker.Unblock();
+            _advertBlocker?.Unblock();
         }
 
         /// <summary>
@@ -85,12 +78,16 @@ namespace SpotifyAdMuter
 
                 if (!wasAdvertPlaying && isAdvertPlaying)
                 {
-                    _advertBlocker.Block();
+                    Debug.WriteLine("Advert is playing, running blocker.");
+                    _advertBlocker?.Block();
                 }
                 else if (wasAdvertPlaying && !isAdvertPlaying)
                 {
-                    _advertBlocker.Unblock();
+                    Debug.WriteLine("Advert was playing, now transitioned to not playing.");
+                    _advertBlocker?.Unblock();
                 }
+
+                Debug.WriteLine(isAdvertPlaying ? "Advert playing." : "No advert playing.");
 
                 wasAdvertPlaying = isAdvertPlaying;
                 Thread.Sleep(250);
@@ -113,6 +110,13 @@ namespace SpotifyAdMuter
             // as the MainWindowTitle should be the name of a song or "Advertisement".
             //bool allTitlesIncludeSpotify = true;
 
+            //Debug.WriteLine("\n\n");
+            //for (int i = 0; i < spotifyProcesses.Length; i++)
+            //{
+            //    Debug.WriteLine(spotifyProcesses[i].MainWindowTitle);
+            //}
+            //return false;
+
             for (int i = 0; i < spotifyProcesses.Length; i++)
             {
                 //StringBuilder windowText = new StringBuilder(256);
@@ -126,10 +130,11 @@ namespace SpotifyAdMuter
                     return true;
                 }
 
-                if (spotifyProcesses[i].MainWindowTitle.StartsWith("Spotify"))
-                {
-                    return true;
-                }
+                // TODO: check this is still a valid way of detecting an Ad.
+                //if (spotifyProcesses[i].MainWindowTitle.StartsWith("Spotify"))
+                //{
+                //    return true;
+                //}
 
                 //if (!spotifyProcesses[i].MainWindowTitle.StartsWith("Spotify"))// &&
                 //    //!string.IsNullOrEmpty(spotifyProcesses[i].MainWindowTitle))
