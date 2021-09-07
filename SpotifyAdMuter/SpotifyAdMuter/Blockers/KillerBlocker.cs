@@ -15,6 +15,7 @@ namespace SpotifyAdMuter.Blockers
 
         const uint WM_APPCOMMAND = 0x0319;
         const uint APPCOMMAND_MEDIA_PLAY = 46;
+        const uint APPCOMMAND_MEDIA_NEXTTRACK = 11;
 
         [DllImport("user32.dll")]
         private static extern IntPtr PostMessage(IntPtr hWnd, uint Msg, IntPtr wParam, IntPtr lParam);
@@ -74,6 +75,9 @@ namespace SpotifyAdMuter.Blockers
             IntPtr spotifyWindowHwnd = spotifyProcess.MainWindowHandle;
 
             if (spotifyWindowHwnd == IntPtr.Zero) { return; }
+
+            // Tell Spotify to select the next track.
+            PostMessage(spotifyWindowHwnd, WM_APPCOMMAND, IntPtr.Zero, (IntPtr)MAKELPARAM(0, (short)APPCOMMAND_MEDIA_NEXTTRACK));
 
             // Send an APPCOMMAND to the Spotify process which instructs it to begin playback.
             PostMessage(spotifyWindowHwnd, WM_APPCOMMAND, IntPtr.Zero, (IntPtr)MAKELPARAM(0, (short)APPCOMMAND_MEDIA_PLAY));
