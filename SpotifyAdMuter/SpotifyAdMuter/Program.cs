@@ -1,8 +1,6 @@
 using SpotifyAdMuter.Blockers;
 using SpotifyAdMuter.Helpers;
 using System;
-using System.Diagnostics;
-using System.Runtime.InteropServices;
 using System.Windows.Forms;
 
 namespace SpotifyAdMuter
@@ -44,15 +42,15 @@ namespace SpotifyAdMuter
 
         public TrayApplicationContext()
         {
-            _muterModeBtn = new ToolStripMenuItem("Muting Mode", null, (o, e) => { ChangeMode(BlockingMode.Muter); });
             _afkModeBtn = new ToolStripMenuItem("Kill Mode", null, (o, e) => { ChangeMode(BlockingMode.Killer); });
+            _muterModeBtn = new ToolStripMenuItem("Muting Mode", null, (o, e) => { ChangeMode(BlockingMode.Muter); });
 
-            _muterModeBtn.ToolTipText = Properties.Resources.BlockingModeMuter;
             _afkModeBtn.ToolTipText = Properties.Resources.BlockingModeAfk;
+            _muterModeBtn.ToolTipText = Properties.Resources.BlockingModeMuter;
 
             var menuStrip = new ContextMenuStrip();
-            menuStrip.Items.Add(_muterModeBtn);
             menuStrip.Items.Add(_afkModeBtn);
+            menuStrip.Items.Add(_muterModeBtn);
             menuStrip.Items.Add(new ToolStripSeparator());
             menuStrip.Items.Add(new ToolStripMenuItem("Exit", null, Exit));
 
