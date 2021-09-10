@@ -105,51 +105,18 @@ namespace SpotifyAdMuter
 
             if (spotifyProcesses.Length == 0) return false;
 
-            // If all the MainWindowTitle's include the name Spotify,
-            // this indicates that a Sponsored Message is showing
-            // as the MainWindowTitle should be the name of a song or "Advertisement".
-            //bool allTitlesIncludeSpotify = true;
-
-            //Debug.WriteLine("\n\n");
-            //for (int i = 0; i < spotifyProcesses.Length; i++)
-            //{
-            //    Debug.WriteLine(spotifyProcesses[i].MainWindowTitle);
-            //}
-            //return false;
-
             for (int i = 0; i < spotifyProcesses.Length; i++)
             {
-                //StringBuilder windowText = new StringBuilder(256);
-                //UnsafeNativeMethods.GetWindowText(spotifyProcesses[i].MainWindowHandle, windowText, windowText.Capacity);
-                //Debug.WriteLine(windowText.ToString());
-
-                // If the MainWindowTitle is blatantly "Advertisement" then immediately return.
+                // These are the known window titles that are present
+                // when an advert is playing.
                 if (spotifyProcesses[i].MainWindowTitle == "Advertisement" ||
                     spotifyProcesses[i].MainWindowTitle == "Shop now")
                 {
                     return true;
                 }
-
-                // TODO: check this is still a valid way of detecting an Ad.
-                //if (spotifyProcesses[i].MainWindowTitle.StartsWith("Spotify"))
-                //{
-                //    return true;
-                //}
-
-                //if (!spotifyProcesses[i].MainWindowTitle.StartsWith("Spotify"))// &&
-                //    //!string.IsNullOrEmpty(spotifyProcesses[i].MainWindowTitle))
-                //{
-                //    allTitlesIncludeSpotify = false;
-                //}
             }
 
             return false;
-            //if (allTitlesIncludeSpotify)
-            //{
-
-            //}
-
-            //return allTitlesIncludeSpotify;
         }
 
     }
