@@ -2,7 +2,7 @@
 
   <PropertyGroup>
     <OutputType>WinExe</OutputType>
-    <TargetFramework>net5.0-windows</TargetFramework>
+    <TargetFramework>net6.0-windows</TargetFramework>
     <UseWindowsForms>true</UseWindowsForms>
     <Nullable>enable</Nullable>
     <Company>Zintom</Company>
@@ -14,6 +14,7 @@
     <ApplicationIcon>spotifyadblockericon.ico</ApplicationIcon>
     <Version>1.2</Version>
     <PackageReleaseNotes>Introducing "kill mode", an alternative to "mute mode".</PackageReleaseNotes>
+    <EnforceCodeStyleInBuild>True</EnforceCodeStyleInBuild>
   </PropertyGroup>
 
   <ItemGroup>
